@@ -1,0 +1,16 @@
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="appleBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="180" height="180" rx="45" fill="url(#appleBg)"/>
+  
+  <!-- Large sparkle icon -->
+  <g transform="translate(90, 90)">
+    <path d="M0 -45L20.336 -13.909L45 0L20.336 13.909L0 45L-20.336 13.909L-45 0L-20.336 -13.909Z" fill="white"/>
+  </g>
+</svg>

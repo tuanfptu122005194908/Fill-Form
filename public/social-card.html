@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AutoFill Social Share Card</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .card {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        .content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            color: white;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .sparkle {
+            width: 40px;
+            height: 40px;
+        }
+        h1 {
+            font-size: 64px;
+            font-weight: 800;
+            margin: 0 0 20px 0;
+            line-height: 1.1;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .subtitle {
+            font-size: 24px;
+            font-weight: 400;
+            margin: 0 0 40px 0;
+            opacity: 0.9;
+            max-width: 800px;
+        }
+        .features {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .feature {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px 25px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.6;
+        }
+        .orb1 {
+            width: 300px;
+            height: 300px;
+            background: #fbbf24;
+            top: -100px;
+            left: -100px;
+        }
+        .orb2 {
+            width: 200px;
+            height: 200px;
+            background: #f87171;
+            bottom: -50px;
+            right: -50px;
+        }
+        .orb3 {
+            width: 150px;
+            height: 150px;
+            background: #60a5fa;
+            top: 50%;
+            right: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="orb orb1"></div>
+        <div class="orb orb2"></div>
+        <div class="orb orb3"></div>
+        <div class="overlay"></div>
+        <div class="content">
+            <div class="logo">
+                <svg class="sparkle" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+            </div>
+            <h1>AutoFill Google Form</h1>
+            <p class="subtitle">Công cụ AI tự động điền hàng trăm form trong vài phút</p>
+            <div class="features">
+                <div class="feature">⚡ Siêu nhanh</div>
+                <div class="feature">🛡️ An toàn</div>
+                <div class="feature">🤖 AI thông minh</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
