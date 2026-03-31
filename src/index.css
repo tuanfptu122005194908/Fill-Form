@@ -188,6 +188,10 @@
     box-shadow: 0 0 30px hsl(var(--primary) / 0.2);
   }
 
+  .shadow-glow-md {
+    box-shadow: 0 0 45px hsl(var(--primary) / 0.25);
+  }
+
   .shadow-soft {
     box-shadow: 0 4px 30px hsl(220 30% 10% / 0.08);
   }
@@ -204,6 +208,10 @@
 
   .animate-glow-pulse {
     animation: glow-pulse 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 4s ease-in-out infinite;
   }
 
   .hover-lift {
@@ -229,6 +237,17 @@
   }
   50% { 
     box-shadow: 0 0 50px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--secondary) / 0.2);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { 
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.95;
+    transform: scale(1.02);
   }
 }
 

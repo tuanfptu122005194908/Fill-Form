@@ -16,6 +16,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { GeneratedResponse } from '@/types/form';
 import { toast } from '@/hooks/use-toast';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const features = [
   { icon: Zap, title: 'Siêu nhanh', desc: 'Gửi hàng trăm form trong vài phút' },
@@ -91,7 +97,8 @@ const Index = () => {
   const handleLogout = () => { logout(); navigate('/login'); };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <TooltipProvider>
+      <div className="min-h-screen bg-background relative overflow-hidden">
       <SakuraEffect />
       
       {/* Mesh gradient background */}
@@ -113,14 +120,42 @@ const Index = () => {
           <div className="flex items-center gap-2">
             {user ? (
               <>
-                <div className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full gradient-primary text-primary-foreground text-xs font-bold shadow-glow-sm">
+                <div className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-full gradient-hero text-primary-foreground text-xs font-bold shadow-glow-sm">
                   <Zap className="h-3.5 w-3.5" />
                   {wallet?.form_balance ?? 0} lượt
                 </div>
-                <Button variant="ghost" size="sm" className="rounded-xl text-xs gap-1.5 font-semibold" onClick={() => navigate('/dashboard')}>
-                  <User className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">{profile?.full_name || 'Dashboard'}</span>
-                </Button>
+                <div className="relative">
+                  {/* Mũi tên nhấp nháy chỉ vào hồ sơ */}
+                  <div className="absolute -bottom-12 -right-2 z-50 animate-bounce">
+                    <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-purple-600 mx-auto"></div>
+                    <div className="flex items-center gap-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg mt-1">
+                      <ArrowRight className="h-3 w-3 animate-pulse" />
+                      <span>Hồ sơ ở đây!</span>
+                    </div>
+                  </div>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-xl text-xs gap-2 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 hover:border-purple-500 hover:from-purple-100 hover:to-pink-100 font-bold px-4 py-2.5 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                        onClick={() => navigate('/dashboard')}
+                      >
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center">
+                          <User className="h-3.5 w-3.5" />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <span className="text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">👤 Hồ sơ</span>
+                          <span className="text-xs text-purple-600 leading-tight">{profile?.full_name || user.email?.split('@')[0]}</span>
+                        </div>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>👆 Bấm vào để xem hồ sơ & dashboard</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 {user.role === 'ADMIN' && (
                   <Button variant="ghost" size="sm" className="rounded-xl text-xs gap-1" onClick={() => navigate('/admin')}>
                     <Settings className="h-3.5 w-3.5" />
@@ -330,7 +365,8 @@ const Index = () => {
           © 2024 AutoFill Tool — Tuấn và Quân
         </p>
       </main>
-    </div>
+      </div>
+    </TooltipProvider>
   );
 };
 

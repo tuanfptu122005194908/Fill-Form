@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Wallet, CreditCard, History, Clock, User, LogOut, Shield, Users, FileText,
-  Sparkles, Zap, ChevronLeft, Menu, TrendingUp, Settings, BookOpen
+  Sparkles, Zap, ChevronLeft, Menu, TrendingUp, Settings, BookOpen, ArrowRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -12,6 +12,12 @@ import {
 } from '@/components/ui/sidebar';
 import { NavLink } from '@/components/NavLink';
 import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const userMenuItems = [
   { title: 'Tổng quan', url: '/dashboard', icon: LayoutDashboard },
@@ -113,13 +119,24 @@ function AppSidebar() {
         )}
 
         {/* Tool link */}
-        <div className="mt-auto p-3">
+        <div className="mt-auto p-3 relative">
+          {/* Mũi tên nhấp nháy chỉ vào nút tool */}
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 z-50 animate-bounce">
+            <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-amber-600 mx-auto"></div>
+            <div className="flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg mt-1">
+              <span>Dùng Tool!</span>
+              <ArrowRight className="h-3 w-3 animate-pulse" />
+            </div>
+          </div>
+          
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <Link to="/" className="flex items-center gap-2 hover:bg-muted/50 rounded-lg p-2">
-                  <Zap className="h-4 w-4 shrink-0 text-accent" />
-                  {!collapsed && <span className="text-sm font-medium">Dùng Tool</span>}
+                <Link to="/" className="flex items-center gap-3 hover:bg-muted/50 rounded-lg p-4 border-2 border-amber-400 hover:border-orange-500 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition-all hover:scale-105 group">
+                  <div className="w-7 h-7 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 text-white flex items-center justify-center">
+                    <Zap className="h-5 w-5" />
+                  </div>
+                  <span className="text-base font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">🚀 Dùng Tool</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -148,34 +165,64 @@ export default function AppLayout() {
   };
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-background">
-        <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Top navbar */}
-          <header className="h-14 border-b border-border/50 glass flex items-center justify-between px-4 sticky top-0 z-20">
-            <div className="flex items-center gap-2">
-              <SidebarTrigger className="rounded-lg" />
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                <Zap className="h-3 w-3" />
-                {wallet?.form_balance ?? 0} lượt
+    <TooltipProvider>
+      <SidebarProvider>
+        <div className="min-h-screen flex w-full bg-background">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col min-w-0">
+            {/* Top navbar */}
+            <header className="h-14 border-b border-border/50 glass flex items-center justify-between px-4 sticky top-0 z-20">
+              <div className="flex items-center gap-2">
+                <SidebarTrigger className="rounded-lg" />
               </div>
-              <Button variant="ghost" size="sm" className="rounded-lg text-xs gap-1.5">
-                <User className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">{profile?.full_name || user.email}</span>
-              </Button>
-              <Button variant="ghost" size="sm" className="rounded-lg text-xs text-destructive gap-1" onClick={handleLogout}>
-                <LogOut className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </header>
-          <main className="flex-1 overflow-auto">
-            <Outlet />
-          </main>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  <Zap className="h-3 w-3" />
+                  {wallet?.form_balance ?? 0} lượt
+                </div>
+                <div className="relative">
+                  {/* Mũi tên nhấp nháy chỉ vào hồ sơ */}
+                  <div className="absolute -bottom-12 -right-2 z-50 animate-bounce">
+                    <div className="w-0 h-0 border-l-[8px] border-l-transparent border-r-[8px] border-r-transparent border-b-[8px] border-b-purple-600 mx-auto"></div>
+                    <div className="flex items-center gap-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg mt-1">
+                      <ArrowRight className="h-3 w-3 animate-pulse" />
+                      <span>Hồ sơ ở đây!</span>
+                    </div>
+                  </div>
+                  
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="rounded-xl text-xs gap-2 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 hover:border-purple-500 hover:from-purple-100 hover:to-pink-100 font-bold px-4 py-2.5 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                        onClick={() => navigate('/dashboard/profile')}
+                      >
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white flex items-center justify-center">
+                          <User className="h-3.5 w-3.5" />
+                        </div>
+                        <div className="flex flex-col items-start">
+                          <span className="text-xs font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">👤 Hồ sơ</span>
+                          <span className="text-xs text-purple-600 leading-tight">{profile?.full_name || user.email?.split('@')[0]}</span>
+                        </div>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>👆 Bấm vào để xem hồ sơ cá nhân</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <Button variant="ghost" size="sm" className="rounded-lg text-xs text-destructive gap-1" onClick={handleLogout}>
+                  <LogOut className="h-3.5 w-3.5" />
+                </Button>
+              </div>
+            </header>
+            <main className="flex-1 overflow-auto">
+              <Outlet />
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }
