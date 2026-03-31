@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Send, Facebook, Youtube, Shuffle, User, LogOut, Settings, Zap, Search, Loader2, ArrowRight, Star, Shield, Clock } from 'lucide-react';
+import { Sparkles, Send, Facebook, Youtube, Shuffle, User, LogOut, Settings, Zap, Search, Loader2, ArrowRight, Star, Shield, Clock, BookOpen, HelpCircle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -124,6 +124,12 @@ const Index = () => {
                   <Zap className="h-3.5 w-3.5" />
                   {wallet?.form_balance ?? 0} lượt
                 </div>
+                
+                <Button variant="outline" size="sm" className="rounded-xl text-xs gap-1.5 font-semibold border-white/20 text-white hover:bg-white/10" onClick={() => navigate('/guide')}>
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Hướng dẫn</span>
+                </Button>
+                
                 <div className="relative">
                   {/* Mũi tên nhấp nháy chỉ vào hồ sơ */}
                   <div className="absolute -bottom-12 -right-2 z-50 animate-bounce">

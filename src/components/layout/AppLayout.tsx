@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Wallet, CreditCard, History, Clock, User, LogOut, Shield, Users, FileText,
-  Sparkles, Zap, ChevronLeft, Menu, TrendingUp, Settings, BookOpen, ArrowRight
+  Sparkles, Zap, ChevronLeft, Menu, TrendingUp, Settings, BookOpen, ArrowRight, HelpCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,6 +26,7 @@ const userMenuItems = [
   { title: 'Lịch sử dùng tool', url: '/dashboard/history', icon: Clock },
   { title: 'Giao dịch', url: '/dashboard/transactions', icon: TrendingUp },
   { title: 'Hồ sơ', url: '/dashboard/profile', icon: User },
+  { title: 'Hướng dẫn', url: '/guide', icon: HelpCircle },
 ];
 
 const adminMenuItems = [
