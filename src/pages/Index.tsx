@@ -50,6 +50,44 @@ const Index = () => {
   const navigate = useNavigate();
   const [settings, setSettings] = useState<any>(null);
 
+  // Auto-play video when section is visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const iframe = entry.target.querySelector('iframe');
+            if (iframe && !iframe.src.includes('autoplay=1')) {
+              iframe.src = iframe.src.replace('autoplay=0&mute=0', 'autoplay=1&mute=0');
+              
+              // Set volume to max after iframe loads using YouTube API
+              iframe.onload = () => {
+                const postMessage = (command: string, value?: string) => {
+                  iframe.contentWindow?.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: command,
+                    args: value ? [value] : []
+                  }), '*');
+                };
+                
+                // Set volume to max using YouTube API
+                setTimeout(() => postMessage('setVolume', '100'), 1000);
+              };
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    const videoSection = document.querySelector('.video-guide-section');
+    if (videoSection) {
+      observer.observe(videoSection);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -218,7 +256,7 @@ const Index = () => {
       </header>
 
       {/* Video Guide Section */}
-      <section className="relative z-10 container max-w-5xl px-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+      <section className="relative z-10 container max-w-5xl px-4 animate-fade-in-up video-guide-section" style={{ animationDelay: '0.2s' }}>
         <Card className="glass-strong border-0 overflow-hidden rounded-3xl">
           <div className="p-8 md:p-12">
             <div className="text-center mb-8">
@@ -235,26 +273,16 @@ const Index = () => {
             </div>
             
             <div className="relative max-w-4xl mx-auto">
-              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-glow-lg bg-black">
-                {/* Custom video player */}
-                <video
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-glow-lg">
+                <iframe
                   className="w-full h-full"
-                  controls
-                  poster="https://img.youtube.com/vi/Adb3X2ikUfg/maxresdefault.jpg"
-                  preload="metadata"
-                >
-                  <source src="https://www.youtube.com/watch?v=Adb3X2ikUfg" type="video/mp4" />
-                  <p className="text-white text-center p-4">
-                    Video không thể tải. <a href="https://www.youtube.com/watch?v=Adb3X2ikUfg" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Xem trên YouTube</a>
-                  </p>
-                </video>
-                
-                {/* Play button overlay for better UX */}
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-black/50 rounded-full p-4 backdrop-blur-sm">
-                    <Play className="h-8 w-8 text-white" />
-                  </div>
-                </div>
+                  src="https://www.youtube.com/embed/Adb3X2ikUfg?autoplay=0&mute=0&rel=0&showinfo=0&controls=1&modestbranding=1&iv_load_policy=3&cc_load_policy=0&hl=vi&fs=1&enablejsapi=1"
+                  title="AutoFill Tool - Hướng Dẫn Sử Dụng"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                  id="youtube-player"
+                ></iframe>
               </div>
               
               {/* Video overlay effects */}
