@@ -1,16 +1,36 @@
 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="pngBg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#ef4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
     </linearGradient>
+    <linearGradient id="sparkle" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   
-  <!-- Background -->
-  <rect width="32" height="32" rx="8" fill="url(#pngBg)"/>
+  <!-- Background with gradient -->
+  <rect width="32" height="32" rx="8" fill="url(#bg)"/>
   
-  <!-- Sparkle icon -->
-  <g transform="translate(16, 16)">
-    <path d="M0 -8L3.618 -2.473L8 0L3.618 2.473L0 8L-3.618 2.473L-8 0L-3.618 -2.473Z" fill="white"/>
+  <!-- Inner glow effect -->
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- Sparkle icon with gradient -->
+  <g transform="translate(16, 16)" filter="url(#glow)">
+    <path d="M0 -10L4.523 -3.09L10 0L4.523 3.09L0 10L-4.523 3.09L-10 0L-4.523 -3.09Z" fill="url(#sparkle)"/>
+    <!-- Center highlight -->
+    <circle cx="0" cy="0" r="2" fill="rgba(255,255,255,0.8)"/>
   </g>
+  
+  <!-- Corner shine effect -->
+  <rect x="4" y="4" width="4" height="4" rx="1" fill="rgba(255,255,255,0.3)"/>
 </svg>

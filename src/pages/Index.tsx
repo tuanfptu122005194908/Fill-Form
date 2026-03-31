@@ -235,15 +235,26 @@ const Index = () => {
             </div>
             
             <div className="relative max-w-4xl mx-auto">
-              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-glow-lg">
-                <iframe
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-glow-lg bg-black">
+                {/* Custom video player */}
+                <video
                   className="w-full h-full"
-                  src="https://www.youtube.com/embed/Adb3X2ikUfg?rel=0&showinfo=0&modestbranding=1"
-                  title="AutoFill Tool - Hướng Dẫn Sử Dụng"
-                  frameBorder="0"
-                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                ></iframe>
+                  controls
+                  poster="https://img.youtube.com/vi/Adb3X2ikUfg/maxresdefault.jpg"
+                  preload="metadata"
+                >
+                  <source src="https://www.youtube.com/watch?v=Adb3X2ikUfg" type="video/mp4" />
+                  <p className="text-white text-center p-4">
+                    Video không thể tải. <a href="https://www.youtube.com/watch?v=Adb3X2ikUfg" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">Xem trên YouTube</a>
+                  </p>
+                </video>
+                
+                {/* Play button overlay for better UX */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-black/50 rounded-full p-4 backdrop-blur-sm">
+                    <Play className="h-8 w-8 text-white" />
+                  </div>
+                </div>
               </div>
               
               {/* Video overlay effects */}
