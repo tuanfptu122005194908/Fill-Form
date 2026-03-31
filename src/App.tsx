@@ -7,7 +7,6 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
-import Guide from "./pages/Guide";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./components/layout/AppLayout";
 import DashboardHome from "./pages/dashboard/DashboardHome";
@@ -38,7 +37,6 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/guide" element={<Guide />} />
 
             {/* Protected user routes */}
             <Route path="/dashboard" element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>

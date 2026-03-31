@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Send, Facebook, Youtube, Shuffle, User, LogOut, Settings, Zap, Search, Loader2, ArrowRight, Star, Shield, Clock, BookOpen, HelpCircle } from 'lucide-react';
+import { Sparkles, Send, Facebook, Youtube, Shuffle, User, LogOut, Settings, Zap, Search, Loader2, ArrowRight, Star, Shield, Clock, Play, Check } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -124,12 +124,6 @@ const Index = () => {
                   <Zap className="h-3.5 w-3.5" />
                   {wallet?.form_balance ?? 0} lượt
                 </div>
-                
-                <Button variant="outline" size="sm" className="rounded-xl text-xs gap-1.5 font-semibold border-white/20 text-white hover:bg-white/10" onClick={() => navigate('/guide')}>
-                  <HelpCircle className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Hướng dẫn</span>
-                </Button>
-                
                 <div className="relative">
                   {/* Mũi tên nhấp nháy chỉ vào hồ sơ */}
                   <div className="absolute -bottom-12 -right-2 z-50 animate-bounce">
@@ -222,6 +216,60 @@ const Index = () => {
           </div>
         </div>
       </header>
+
+      {/* Video Guide Section */}
+      <section className="relative z-10 container max-w-5xl px-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+        <Card className="glass-strong border-0 overflow-hidden rounded-3xl">
+          <div className="p-8 md:p-12">
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/20 to-pink-500/20 border border-red-500/30 mb-4">
+                <Play className="h-4 w-4 text-red-400" />
+                <span className="text-red-400 text-sm font-medium">Video Hướng Dẫn</span>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-extrabold text-gradient mb-4">
+                Xem Hướng Dẫn Sử Dụng
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                Video chi tiết hướng dẫn cách sử dụng AutoFill Tool hiệu quả nhất
+              </p>
+            </div>
+            
+            <div className="relative max-w-4xl mx-auto">
+              <div className="relative aspect-video rounded-2xl overflow-hidden shadow-glow-lg">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/Adb3X2ikUfg?rel=0&showinfo=0&modestbranding=1"
+                  title="AutoFill Tool - Hướng Dẫn Sử Dụng"
+                  frameBorder="0"
+                  allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                ></iframe>
+              </div>
+              
+              {/* Video overlay effects */}
+              <div className="absolute -inset-4 bg-gradient-to-r from-red-500/10 to-pink-500/10 rounded-3xl blur-xl -z-10"></div>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-red-500/20 rounded-full blur-3xl animate-pulse"></div>
+            </div>
+            
+            <div className="mt-8 text-center">
+              <div className="flex flex-wrap justify-center gap-4">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success">
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-medium">Hướng dẫn chi tiết</span>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success">
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-medium">Bước-by-bước</span>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-success/10 text-success">
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-medium">Mẹo và thủ thuật</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </Card>
+      </section>
 
       {/* Main Content */}
       <main className="container max-w-5xl pb-12 relative z-10 px-4">
