@@ -8,6 +8,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Redirect /index.html to /
+app.get("/index.html", (req, res) => {
+  res.redirect("/");
+});
+
 // Serve static files from dist folder
 app.use(express.static(path.join(__dirname, "dist")));
 
