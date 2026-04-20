@@ -3,7 +3,3 @@ services:
     name: fill-form-auto
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
-    routes:
-      - path: /*
-        destination: /index.html
-        action: rewrite
