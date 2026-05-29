@@ -10,7 +10,9 @@ export function useFormAutoFill() {
   const [htmlSource, setHtmlSource] = useState('');
   const [fields, setFields] = useState<FormField[]>([]);
   const [pageCount, setPageCount] = useState(1);
-  const [delayMs, setDelayMs] = useState(1500);
+  const [delayMs, setDelayMs] = useState(2500);
+  const [delayMode, setDelayMode] = useState<'fixed' | 'random'>('random');
+  const [delayRange, setDelayRange] = useState({ min: 300000, max: 1800000 });
   const [generatedResponses, setGeneratedResponses] = useState<GeneratedResponse[]>([]);
   const [status, setStatus] = useState<SubmitStatus>({
     current: 0,
@@ -157,10 +159,16 @@ export function useFormAutoFill() {
         await submitFormResponse(submitUrl, generatedResponses[i], fields, pageCount);
         successCountRef.current++;
         
-        setStatus({ current: i + 1, total, status: 'submitting', message: `Đã gửi ${i + 1}/${total}` });
-
         if (i < total - 1 && isRunningRef.current && !isPausedRef.current) {
+          setStatus({ 
+            current: i + 1, 
+            total, 
+            status: 'submitting', 
+            message: `Đã gửi ${i + 1}/${total} • Chờ 2.5s trước khi gửi tiếp...` 
+          });
           await sleep(delayMs);
+        } else {
+          setStatus({ current: i + 1, total, status: 'submitting', message: `Đã gửi ${i + 1}/${total}` });
         }
       } catch (error) {
         console.error(`Error submitting response ${i + 1}:`, error);
@@ -233,6 +241,10 @@ export function useFormAutoFill() {
     fields,
     delayMs,
     setDelayMs,
+    delayMode,
+    setDelayMode,
+    delayRange,
+    setDelayRange,
     generatedResponses,
     setGeneratedResponses,
     status,

@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sparkles, Send, Facebook, Youtube, Shuffle, User, LogOut, Settings, Zap, Search, Loader2, ArrowRight, Star, Shield, Clock, Play, Check } from 'lucide-react';
+import { Sparkles, Send, Facebook, Youtube, Shuffle, User, LogOut, Settings, Zap, Search, Loader2, ArrowRight, Star, Shield, Clock, Play, Check, FileSpreadsheet } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { FormUrlInput } from '@/components/FormUrlInput';
 import { FieldsList } from '@/components/FieldsList';
 import { SubmitProgress } from '@/components/SubmitProgress';
@@ -34,6 +36,12 @@ const Index = () => {
     formUrl,
     setFormUrl,
     fields,
+    delayMs,
+    setDelayMs,
+    delayMode,
+    setDelayMode,
+    delayRange,
+    setDelayRange,
     generatedResponses,
     setGeneratedResponses,
     status,
@@ -133,6 +141,72 @@ const Index = () => {
   const handleResume = () => { if (user) resumeSubmitting(user.user_id); };
   const handleStop = async () => { stopSubmitting(); if (user) await refreshWallet(); };
   const handleLogout = () => { logout(); navigate('/login'); };
+
+  const handleExportCSV = () => {
+    if (generatedResponses.length === 0) return;
+
+    // 1. Tạo danh sách Header: "Dấu thời gian", "Câu hỏi 1", "Câu hỏi 2",...
+    const headers = ['Dấu thời gian', ...fields.map(f => f.name)];
+
+    // 2. Sinh danh sách timestamp fake lùi dần về quá khứ
+    const timestamps: string[] = [];
+    let currentMillis = Date.now();
+
+    const minGap = delayMode === 'fixed' ? delayMs : delayRange.min;
+    const maxGap = delayMode === 'fixed' ? delayMs : delayRange.max;
+
+    for (let i = 0; i < generatedResponses.length; i++) {
+      // Giãn cách ngẫu nhiên theo cấu hình của người dùng trên UI
+      const randomGap = delayMode === 'fixed' ? delayMs : (Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap);
+      currentMillis -= randomGap;
+      
+      const date = new Date(currentMillis);
+      // Định dạng dd/mm/yyyy hh:mm:ss
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      
+      timestamps.push(`${day}/${month}/${year} ${hours}:${minutes}:${seconds}`);
+    }
+
+    // Đảo ngược timestamp để thời gian tăng dần từ trên xuống dưới
+    timestamps.reverse();
+
+    // 3. Xây dựng nội dung các dòng dữ liệu
+    const rows = generatedResponses.map((resp, idx) => {
+      const rowData = [
+        `"${timestamps[idx]}"`,
+        ...fields.map(field => {
+          const val = resp[field.entryId] || '';
+          // Bao bọc bằng dấu nháy kép và escape nháy kép để tránh lỗi định dạng CSV
+          const cleanVal = String(val).replace(/"/g, '""');
+          return `"${cleanVal}"`;
+        })
+      ];
+      return rowData.join(',');
+    });
+
+    // Ghép header và rows kèm ký tự BOM của UTF-8 (\uFEFF) để Excel hiển thị đúng tiếng Việt
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows].join('\n');
+
+    // 4. Tải file xuống
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `AutoFill_KetQua_FakeTime_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: 'Xuất file thành công',
+      description: 'Đã tải xuống file Excel (.csv) chứa dữ liệu và dấu thời gian ngẫu nhiên hoàn hảo!',
+    });
+  };
 
   return (
     <TooltipProvider>
@@ -390,6 +464,185 @@ const Index = () => {
                   </div>
                   <div className="space-y-6 pl-0 md:pl-[60px]">
                     <ResponsePreview responses={generatedResponses} fields={fields} />
+
+                    {/* Nút Xuất file Excel giả lập - CHỈ HIỂN THỊ KHI ĐÃ GỬI XONG HOÀN TOÀN */}
+                    {status.status === 'completed' && (
+                      <div className="p-4.5 rounded-2xl border border-emerald-500/20 bg-emerald-500/5 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in">
+                        <div className="space-y-1 text-center sm:text-left">
+                          <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 flex items-center gap-1.5 justify-center sm:justify-start">
+                            <FileSpreadsheet className="h-4.5 w-4.5" />
+                            Tải file Excel kết quả (Dấu thời gian giãn cách)
+                          </h4>
+                          <p className="text-xs text-muted-foreground leading-normal">
+                            🎉 Gửi form thành công! Hãy tải xuống file Excel (.csv) đã được **giả lập Dấu thời gian giãn cách 5-30 phút ngẫu nhiên** để sử dụng báo cáo.
+                          </p>
+                        </div>
+                        <Button
+                          onClick={handleExportCSV}
+                          className="w-full sm:w-auto h-11 px-6 gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-md shadow-emerald-600/10 active:scale-95 animate-bounce"
+                        >
+                          <FileSpreadsheet className="h-4 w-4" />
+                          Tải xuống file Excel (.csv)
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Cài đặt dấu thời gian cho file Excel */}
+                    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5 space-y-4 shadow-sm backdrop-blur-md">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <FileSpreadsheet className="h-5 w-5 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                          <h3 className="text-sm font-bold text-foreground">Cấu hình Dấu thời gian (File Excel xuất ra)</h3>
+                        </div>
+                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+                          delayMode === 'random' 
+                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-500/20 animate-pulse' 
+                            : 'bg-muted text-muted-foreground'
+                        }`}>
+                          {delayMode === 'random' ? '🛡️ Thời gian ngẫu nhiên' : '⚡ Thời gian cố định'}
+                        </span>
+                      </div>
+
+                      <p className="text-xs text-muted-foreground leading-normal">
+                        ⚡ **Lưu ý**: Để gửi nhanh và mượt mà, quá trình gửi form thực tế lên Google Forms luôn cố định là **2.5 giây/câu hỏi**. Khoảng giãn cách thiết lập dưới đây sẽ chỉ dùng để **fake cột Dấu thời gian trong file Excel kết quả** khi bạn tải về.
+                      </p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <Button
+                          type="button"
+                          variant={delayMode === 'fixed' ? 'default' : 'outline'}
+                          onClick={() => setDelayMode('fixed')}
+                          className={`h-11 rounded-xl font-semibold text-xs gap-2 transition-all ${
+                            delayMode === 'fixed' 
+                              ? 'bg-foreground text-background shadow-md' 
+                              : 'bg-background hover:bg-muted border border-border/60'
+                          }`}
+                        >
+                          <Zap className="h-3.5 w-3.5" />
+                          Thời gian cố định
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={delayMode === 'random' ? 'default' : 'outline'}
+                          onClick={() => setDelayMode('random')}
+                          className={`h-11 rounded-xl font-semibold text-xs gap-2 transition-all ${
+                            delayMode === 'random' 
+                              ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20' 
+                              : 'bg-background hover:bg-muted border border-border/60'
+                          }`}
+                        >
+                          <Shuffle className="h-3.5 w-3.5" />
+                          Thời gian ngẫu nhiên
+                        </Button>
+                      </div>
+
+                      {delayMode === 'fixed' ? (
+                        <div className="space-y-2 animate-fade-in">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="text-muted-foreground font-medium">Khoảng cách thời gian cố định</span>
+                            <span className="font-bold font-mono text-foreground">{(delayMs / 1000).toFixed(1)} giây</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <input
+                              type="range"
+                              min="1000"
+                              max="15000"
+                              step="500"
+                              value={delayMs}
+                              onChange={(e) => setDelayMs(parseInt(e.target.value))}
+                              className="w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-muted accent-foreground"
+                            />
+                          </div>
+                          <p className="text-[11px] text-muted-foreground/80 leading-normal">
+                            Thời gian của các dòng trong file Excel kết quả sẽ cách đều nhau đúng <span className="font-bold">{(delayMs / 1000).toFixed(1)}s</span>.
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3 animate-fade-in">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-muted-foreground font-semibold">Giãn cách tối thiểu (Min)</label>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  min="1"
+                                  max={Math.floor(delayRange.max / 1000)}
+                                  value={Math.floor(delayRange.min / 1000)}
+                                  onChange={(e) => {
+                                    const minSec = Math.max(1, parseInt(e.target.value) || 1);
+                                    setDelayRange(prev => ({ ...prev, min: minSec * 1000 }));
+                                  }}
+                                  className="h-10 bg-background/50 border border-border rounded-xl pr-7 text-xs font-bold"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">s</span>
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-xs text-muted-foreground font-semibold">Giãn cách tối đa (Max)</label>
+                              <div className="relative">
+                                <Input
+                                  type="number"
+                                  min={Math.floor(delayRange.min / 1000)}
+                                  max="3600"
+                                  value={Math.floor(delayRange.max / 1000)}
+                                  onChange={(e) => {
+                                    const maxSec = Math.max(Math.floor(delayRange.min / 1000) + 1, parseInt(e.target.value) || 2);
+                                    setDelayRange(prev => ({ ...prev, max: maxSec * 1000 }));
+                                  }}
+                                  className="h-10 bg-background/50 border border-border rounded-xl pr-7 text-xs font-bold"
+                                />
+                                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-mono">s</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2 pt-1">
+                            <span className="text-[10px] text-muted-foreground font-semibold flex items-center">Gợi ý khoảng trễ:</span>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDelayRange({ min: 3000, max: 10000 })}
+                              className="h-7 px-2.5 rounded-lg text-[10px] font-bold border-border/60 hover:bg-muted"
+                            >
+                              🚀 Nhanh & Tự nhiên (3s - 10s)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDelayRange({ min: 10000, max: 30000 })}
+                              className="h-7 px-2.5 rounded-lg text-[10px] font-bold border-border/60 hover:bg-muted"
+                            >
+                              🍃 Vừa phải (10s - 30s)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDelayRange({ min: 30000, max: 120000 })}
+                              className="h-7 px-2.5 rounded-lg text-[10px] font-bold border-border/60 hover:bg-muted"
+                            >
+                              🔒 Siêu an toàn (30s - 2p)
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setDelayRange({ min: 300000, max: 1800000 })}
+                              className="h-7 px-2.5 rounded-lg text-[10px] font-bold border-border/60 hover:bg-muted bg-accent/5 text-accent border-accent/20"
+                            >
+                              🕵️ Giả lập người thật (5p - 30p)
+                            </Button>
+                          </div>
+
+                          <p className="text-[11px] text-muted-foreground/80 leading-normal">
+                            ✨ Khi xuất file Excel, các dòng sẽ được **giả lập Dấu thời gian ngẫu nhiên** cách nhau từ <span className="font-bold text-emerald-600 dark:text-emerald-400">{(delayRange.min / 1000).toFixed(0)}s</span> đến <span className="font-bold text-emerald-600 dark:text-emerald-400">{(delayRange.max / 1000).toFixed(0)}s</span> (ví dụ: cách nhau 15 phút, 28 phút...). Đảm bảo file Excel xuất ra trông tự nhiên và **hoàn toàn giống người thật điền 100%!**
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
                     <SubmitProgress
                       status={status}
                       responsesCount={generatedResponses.length}
