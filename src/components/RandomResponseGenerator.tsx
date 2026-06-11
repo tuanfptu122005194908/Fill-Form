@@ -369,11 +369,26 @@ QUAN TRỌNG:
     }
 
     const responses: GeneratedResponse[] = [];
-    const triggerField = fields.find(f => f.entryId === branchConfig!.triggerEntryId);
+    const assignedFieldIds = new Set(branchConfig!.branches.flatMap(b => b.fieldEntryIds));
+    const commonFields = fields.filter(
+      f => f.entryId !== branchConfig!.triggerEntryId && !assignedFieldIds.has(f.entryId)
+    );
     
     for (const branch of branchConfig!.branches) {
       for (let i = 0; i < branch.count; i++) {
         const resp: GeneratedResponse = { [branchConfig!.triggerEntryId]: branch.optionValue };
+
+        // Populate common fields so questions before/after the branch trigger are not left blank.
+        for (const field of commonFields) {
+          if ([2, 3, 4, 7, 5, 18].includes(field.type)) {
+            const options = field.options || (field.scaleMin !== undefined ? Array.from({length: field.scaleMax! - field.scaleMin! + 1}, (_, idx) => String(field.scaleMin! + idx)) : []);
+            const dist = getDeterministicDistributionByCount(options, counts[field.entryId], totalBranchResponses);
+            resp[field.entryId] = dist.length > 0 ? dist[responses.length % dist.length] : '';
+          } else {
+            const lines = (textAnswers[field.entryId] || '').split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            resp[field.entryId] = lines.length > 0 ? lines[responses.length % lines.length] : '';
+          }
+        }
         
         // Populate fields in this branch
         const branchFields = fields.filter(f => branch.fieldEntryIds.includes(f.entryId));
