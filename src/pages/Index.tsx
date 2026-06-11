@@ -36,6 +36,7 @@ const Index = () => {
     formUrl,
     setFormUrl,
     fields,
+    pageBreakMap,
     delayMs,
     setDelayMs,
     delayMode,
@@ -440,7 +441,7 @@ const Index = () => {
                   </div>
                   <div className="space-y-6 pl-0 md:pl-[60px]">
                     <FieldsList fields={fields} />
-                    <RandomResponseGenerator fields={fields} onResponsesReady={handleManualResponsesReady} maxCount={wallet?.form_balance} />
+                    <RandomResponseGenerator fields={fields} onResponsesReady={handleManualResponsesReady} maxCount={wallet?.form_balance} pageBreakMap={pageBreakMap} />
                   </div>
                 </section>
               </>

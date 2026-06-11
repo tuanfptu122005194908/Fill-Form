@@ -19,10 +19,14 @@ export function getTypeLabel(type: number): string {
 export interface ParseResult {
   fields: FormField[];
   pageCount: number;
+  /** Map: pageIndex (0-based) → tiêu đề section (hoặc "Phần X" nếu không có tiêu đề) */
+  pageBreakMap: Map<number, string>;
 }
 
 export function parseFormHtml(htmlSource: string): ParseResult {
   const fields: FormField[] = [];
+  const pageBreakMap = new Map<number, string>();
+  pageBreakMap.set(0, 'Phần 1'); // trang đầu tiên luôn là trang 0
 
   try {
     const regex = /FB_PUBLIC_LOAD_DATA_\s*=\s*(\[[\s\S]*?\]);/;
@@ -38,12 +42,9 @@ export function parseFormHtml(htmlSource: string): ParseResult {
     const formStructure = new Function(`return ${jsonString}`)();
     
     // Google Forms stores questions across all pages in formStructure[1][1]
-    // Multi-page forms have page breaks as separate items but all questions are in the same array
-    // Some forms may nest questions differently, so we also check formStructure[1] deeper
     let questionsArray = formStructure?.[1]?.[1];
 
     if (!questionsArray || !Array.isArray(questionsArray)) {
-      // Fallback: try to find questions array in alternative structure
       const formData = formStructure?.[1];
       if (formData && Array.isArray(formData)) {
         for (const item of formData) {
@@ -58,7 +59,27 @@ export function parseFormHtml(htmlSource: string): ParseResult {
       }
     }
 
-    questionsArray.forEach((q: any) => {
+    // First pass: build page break map & track which pageIndex each question gets
+    let currentPage = 0;
+    const questionPageMap: number[] = []; // index in questionsArray → pageIndex
+
+    questionsArray.forEach((q: any, qIdx: number) => {
+      if (!q || !Array.isArray(q)) {
+        questionPageMap.push(currentPage);
+        return;
+      }
+      const type = q[3];
+      if (type === 8) {
+        // Page break — increment page counter and record section title
+        currentPage++;
+        const sectionTitle = (q[1] || '').replace(/<[^>]*>/g, '').trim();
+        pageBreakMap.set(currentPage, sectionTitle || `Phần ${currentPage + 1}`);
+      }
+      questionPageMap.push(currentPage);
+    });
+
+    // Second pass: extract fields
+    questionsArray.forEach((q: any, qIdx: number) => {
       if (!q || !Array.isArray(q)) return;
       
       const questionData = q[4];
@@ -70,6 +91,7 @@ export function parseFormHtml(htmlSource: string): ParseResult {
         .trim();
 
       const type = q[3] || 0;
+      const pageIndex = questionPageMap[qIdx] ?? 0;
 
       // Grid questions (type 7) - each row is a separate field
       if (type === 7) {
@@ -78,13 +100,11 @@ export function parseFormHtml(htmlSource: string): ParseResult {
           const entryId = rowData[0];
           if (!entryId) return;
 
-          // Try to extract row label from rowData[3][0] or use index
           let rowLabel = `Hàng ${rowIdx + 1}`;
           if (rowData[3] && Array.isArray(rowData[3]) && rowData[3][0]) {
             rowLabel = String(rowData[3][0]).replace(/<[^>]*>/g, '').trim();
           }
 
-          // Column options
           let options: string[] | undefined;
           if (rowData[1] && Array.isArray(rowData[1])) {
             options = rowData[1]
@@ -99,6 +119,7 @@ export function parseFormHtml(htmlSource: string): ParseResult {
             type: 7,
             typeLabel: 'Lưới',
             options,
+            pageIndex,
           });
         });
         return;
@@ -110,7 +131,6 @@ export function parseFormHtml(htmlSource: string): ParseResult {
       const entryId = entryData[0];
       if (!entryId) return;
       
-      // Extract options for choice-based questions
       let options: string[] | undefined;
       if ([2, 3, 4].includes(type) && entryData[1] && Array.isArray(entryData[1])) {
         options = entryData[1]
@@ -119,7 +139,6 @@ export function parseFormHtml(htmlSource: string): ParseResult {
           .filter((opt: string) => opt.length > 0);
       }
 
-      // Extract scale range for scale questions (type 5) and star rating (type 18)
       let scaleMin: number | undefined;
       let scaleMax: number | undefined;
       if ([5, 18].includes(type) && entryData[1] && Array.isArray(entryData[1])) {
@@ -137,16 +156,17 @@ export function parseFormHtml(htmlSource: string): ParseResult {
         options,
         scaleMin,
         scaleMax,
+        pageIndex,
       });
     });
 
-    // Count pages: page breaks are items with type 8, plus 1 for the first page
+    // Count pages
     let pageCount = 1;
     questionsArray.forEach((q: any) => {
       if (q && Array.isArray(q) && q[3] === 8) pageCount++;
     });
 
-    return { fields, pageCount };
+    return { fields, pageCount, pageBreakMap };
   } catch (error) {
     console.error('Error parsing form HTML:', error);
     throw error;
@@ -164,3 +184,4 @@ export function getSubmitUrl(formUrl: string): string {
     return submitUrl;
   }
 }
+

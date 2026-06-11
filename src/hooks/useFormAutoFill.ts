@@ -10,6 +10,7 @@ export function useFormAutoFill() {
   const [htmlSource, setHtmlSource] = useState('');
   const [fields, setFields] = useState<FormField[]>([]);
   const [pageCount, setPageCount] = useState(1);
+  const [pageBreakMap, setPageBreakMap] = useState<Map<number, string>>(new Map([[0, 'Phần 1']]));
   const [delayMs, setDelayMs] = useState(2500);
   const [delayMode, setDelayMode] = useState<'fixed' | 'random'>('random');
   const [delayRange, setDelayRange] = useState({ min: 300000, max: 1800000 });
@@ -80,6 +81,7 @@ export function useFormAutoFill() {
 
       setFields(result.fields);
       setPageCount(result.pageCount);
+      setPageBreakMap(result.pageBreakMap);
       setGeneratedResponses([]);
       
       toast({
@@ -239,6 +241,7 @@ export function useFormAutoFill() {
     htmlSource,
     setHtmlSource,
     fields,
+    pageBreakMap,
     delayMs,
     setDelayMs,
     delayMode,
