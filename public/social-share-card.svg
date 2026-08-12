@@ -1,0 +1,53 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="40" />
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative orbs -->
+  <circle cx="150" cy="150" r="150" fill="#fbbf24" opacity="0.6" filter="url(#blur)"/>
+  <circle cx="1050" cy="480" r="100" fill="#f87171" opacity="0.6" filter="url(#blur)"/>
+  <circle cx="900" cy="200" r="75" fill="#60a5fa" opacity="0.6" filter="url(#blur)"/>
+  
+  <!-- Logo background -->
+  <rect x="510" y="100" width="180" height="180" rx="36" fill="rgba(255,255,255,0.2)" backdrop-filter="blur(10px)"/>
+  
+  <!-- Sparkle icon -->
+  <g transform="translate(600, 190)">
+    <path d="M0 -30L13.545 -9.27L30 0L13.545 9.27L0 30L-13.545 9.27L-30 0L-13.545 -9.27Z" fill="white"/>
+  </g>
+  
+  <!-- Title -->
+  <text x="600" y="380" font-family="Arial, sans-serif" font-size="64" font-weight="800" text-anchor="middle" fill="white">
+    AutoFill Google Form
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="440" font-family="Arial, sans-serif" font-size="24" font-weight="400" text-anchor="middle" fill="rgba(255,255,255,0.9)">
+    Công cụ AI tự động điền hàng trăm form trong vài phút
+  </text>
+  
+  <!-- Feature badges -->
+  <rect x="350" y="500" width="140" height="50" rx="25" fill="rgba(255,255,255,0.15)" backdrop-filter="blur(10px)"/>
+  <text x="420" y="530" font-family="Arial, sans-serif" font-size="18" font-weight="600" text-anchor="middle" fill="white">
+    ⚡ Siêu nhanh
+  </text>
+  
+  <rect x="530" y="500" width="140" height="50" rx="25" fill="rgba(255,255,255,0.15)" backdrop-filter="blur(10px)"/>
+  <text x="600" y="530" font-family="Arial, sans-serif" font-size="18" font-weight="600" text-anchor="middle" fill="white">
+    🛡️ An toàn
+  </text>
+  
+  <rect x="710" y="500" width="140" height="50" rx="25" fill="rgba(255,255,255,0.15)" backdrop-filter="blur(10px)"/>
+  <text x="780" y="530" font-family="Arial, sans-serif" font-size="18" font-weight="600" text-anchor="middle" fill="white">
+    🤖 AI thông minh
+  </text>
+</svg>

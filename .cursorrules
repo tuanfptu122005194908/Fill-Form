@@ -1,0 +1,8 @@
+# Lệnh import các rules cốt lõi từ AGENTS.md (Cursor sẽ ưu tiên file này nhưng không được phủ nhận nội dung AGENTS.md)
+# Ref: AGENTS.md là nguồn chính — mọi rule ở đây bổ sung cho Cursor IDE, không phủ nhận quy tắc trong AGENTS.md
+
+Kế thừa tất cả từ AGENTS.md.
+Khi implement code:
+1. Luôn đọc và tuân thủ các đặc tả `SPEC.md` tương ứng trong thư mục `.sdd/specs/`.
+2. Kiểm tra các thiết kế giao diện UI/UX trong `.sdd/ui-rules.md` và `.sdd/design.md` trước khi gen mã UI.
+3. Không tự ý thêm thư viện ngoài (dependencies) nếu chưa có sự đồng ý của developer, ngoại trừ các components của `shadcn-ui`.
